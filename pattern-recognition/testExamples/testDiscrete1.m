@@ -1,0 +1,1 @@
+function [hNew,hGen]=testDiscrete%test training a single DiscreteD object%Arne Leijon 2005-10-25 tested%make a simple DiscreteD distributionhGen=DiscreteD([3 3 1 1]);%Make a big training data sequence:xTraining=rand(hGen,3000);%training datahNew=init(DiscreteD,xTraining);

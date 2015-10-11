@@ -1,0 +1,1 @@
+function figH=testVQcluster(nC)%Draw test of VQ design%Arne Leijon 2006-03-31 testedX=randn(2,500);%training datavq=VQ('CodeBook',cluster(X,nC));figH=figure;plot(X(1,:),X(2,:),'.b');hold on;cX=get(vq,'CodeBook');voronoi(cX(1,:),cX(2,:),'r');plot(cX(1,:),cX(2,:),'or');axis equal;axis([-3 3 -3 3]);hold off;title('VQ design by clustering');

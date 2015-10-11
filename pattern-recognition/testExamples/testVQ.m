@@ -1,0 +1,1 @@
+function figH=testVQ(nC)%Draw test of VQ design%Arne Leijon 2009-07-19 testedX=randn(2,50000);%training datavq=create(VQ,X,nC);figH=figure;plot(X(1,:),X(2,:),'.b');hold on;cX=vq.CodeBook;voronoi(cX(1,:),cX(2,:),'r');plot(cX(1,:),cX(2,:),'or');axis equal;axis([-3 3 -3 3]);hold off;title('VQ design');

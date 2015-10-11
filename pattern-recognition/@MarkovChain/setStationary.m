@@ -1,0 +1,1 @@
+%function mc=setStationary(mc);%sets initial state probability to stationary state probability%for a stationary ergodic MarkovChain.%%Input:%mc=     single MarkovChain object%%Result:%mc=     modified MarkovChain object%%Arne Leijon 2004-11-24 testedfunction mc=setStationary(mc)mc.InitialProb=stationaryProb(mc);
