@@ -8,15 +8,15 @@ function [ transcript ] = transcribe_drums( audioPath, models )
 %   determines if the drum was triggered or not.
 
 % Read test data and extract features.
-[features, timestamps] = read_audio('songs/test.wav');
+[features, timestamps] = read_audio(audioPath);
 
 % Go through each drum and determine if it's likeliest that it was silent or not per frame.
 transcript = zeros(0, 2);
 for i = 1:length(models)
-    hmm = models{i};
-    drum = hmm{1};
-    sound = hmm{2};
-    silent = hmm{3};
+    model = models{i};
+    drum = model{1};
+    sound = model{2};
+    silent = model{3};
     
     % TODO Test look-ahead segmentation. Is this too naive? What is a good
     % window size?
@@ -26,7 +26,7 @@ for i = 1:length(models)
         time = timestamps(j);
         p1 = sound.logprob(window);
         p2 = mean(silent.logprob(window));
-        if (p1 > p2)
+        if (p1 - p2 > -2000) % TODO Why does p1 return such low probabilities? More training required to win over silence GMMs?
             transcript(end+1, :) = [time drum];
         end;
     end;

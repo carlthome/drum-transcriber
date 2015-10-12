@@ -28,7 +28,7 @@ models = {};
 % TODO Abstract drum map to separate script.
 snare = 38;
 kick = 36;
-hihat = 42;
+hihat = 52; % TODO Should be 42.
 
 % Go through every drum we want to recognize.
 for drum = [snare kick hihat]
@@ -39,12 +39,17 @@ for drum = [snare kick hihat]
     % vectors.
     [includedFeatures, excludedFeatures] = segment_features(features, timestamps, 'training-data/sample.mid', drum);
     
+    % No point training a model if the particular drum was never played.
+    if isempty(includedFeatures)
+        continue;
+    end;
+    
     % Convert segmentation output into readable input by the pattern
     % recognition library.
     soundTraining = cell2mat(includedFeatures);
-    soundTrainingLengths = cellfun(@length, includedFeatures);
+    soundTrainingLengths = cellfun('size', includedFeatures, 2);
     silentTraining = cell2mat(excludedFeatures);
-    silentTrainingLengths = cellfun(@length, excludedFeatures);
+    silentTrainingLengths = cellfun('size', excludedFeatures, 2);
     
     % Create, train and store a pair of pattern recognition models for
     % the current drum. One model is used to detect if the drum is

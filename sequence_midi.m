@@ -6,7 +6,7 @@ function [ midi ] = sequence_midi( transcript )
 %   messages of an arbitrarily short duration.
 
 midiSequence = zeros(0, 6);
-for t = transcript
+for t = transcript'
     time = t(1);
     drum = t(2);
     
