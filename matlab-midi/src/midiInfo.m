@@ -198,9 +198,9 @@ end
 % make this an option!!!
 % - I'm not sure why it's needed...
 % remove start silence:
-first_t = min(Notes(:,5));
-Notes(:,5) = Notes(:,5) - first_t;
-Notes(:,6) = Notes(:,6) - first_t;
+% first_t = min(Notes(:,5));
+% Notes(:,5) = Notes(:,5) - first_t;
+% Notes(:,6) = Notes(:,6) - first_t;
 
 % sort Notes by start time:
 [junk,ord] = sort(Notes(:,5));
