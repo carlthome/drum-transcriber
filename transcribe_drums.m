@@ -26,8 +26,8 @@ for i = 1:length(models)
         window = features(:, j:j+lookAhead);
         time = timestamps(j);
         p1 = sound.logprob(window);
-        p2 = silent.logprob(window);
-        if (p1 > p2)
+        p2 = mean(silent.logprob(window));
+        if p1 > p2
             disp(['Drum ' num2str(drum) ' hit at ' num2str(time) ' seconds.']);
             transcript(end+1, :) = [time drum];
         end;

@@ -29,6 +29,7 @@ if isempty(transcript)
     disp('No drums detected. Aborting.');
 else
     % Create MIDI file from the transcribed drums.
+    % TODO Quantize MIDI file with tempo detection of audio file.
     midi = sequence_midi(transcript);
     
     % Store MIDI file on disk.
@@ -45,7 +46,7 @@ else
         plot(mono);
         for i= 1:size(notes, 1)
             note = notes(i, 3);
-            onset = start + notes(i, 5) * fs;
+            onset = notes(i, 5) * fs;
             if note == 36; line([onset onset], [-1 1], 'Color', 'r');
             elseif note == 38; line([onset onset], [-1 1], 'Color', 'g');
             elseif note == 42; line([onset onset], [-1 1], 'Color', 'b');

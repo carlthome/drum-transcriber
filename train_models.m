@@ -15,21 +15,21 @@ function models = train_models(patternDirectory)
 %   probability the drum has likely been triggered in the observation
 %   sequence.
 
-models = {};
-
 % TODO Abstract drum map to separate script.
 kick = 36;
 snare = 38;
 hihat = 42;
+drums = {kick, snare, hihat};
 
 % Go through a directory with multiple songs (audio + MIDI pairs) and
-% extract features.
-drums = {kick, snare, hihat};
-includedFeatures = containers.Map(drums, {{}, {}, {}});
-excludedFeatures = containers.Map(drums, {{}, {}, {}});
-for file = dir([patternDirectory '/*.wav'])'
-    n = file.name;
-    [a, name, b] = fileparts(n);
+% extract and segment features (using the parallel processing toolbox).
+files = dir([patternDirectory '/*.wav']);
+paths = {files.name};
+included = cell(size(paths));
+excluded = cell(size(paths));
+parfor i = 1:length(paths)
+    path = paths{i};
+    [~, name, ~] = fileparts(path);
     pathToAudio = [patternDirectory '/' name '.wav'];
     pathToMidi = [patternDirectory '/' name '.mid'];
     
@@ -41,12 +41,25 @@ for file = dir([patternDirectory '/*.wav'])'
     % according to the MIDI file, and one set of the remaining feature
     % vectors.
     [m1, m2] = segment_features(features, timestamps, pathToMidi, drums);
+    included{i} = m1;
+    excluded{i} = m2;
+end;
+
+% Concatenate feature vector sequences, assuming there is silence in the
+% beginning and end of each song.
+includedFeatures = containers.Map(drums, {{}, {}, {}});
+excludedFeatures = containers.Map(drums, {{}, {}, {}});
+for i = 1:length(paths)
+    m1 = included{i};
+    m2 = excluded{i};
     includedFeatures = [includedFeatures; m1];
     excludedFeatures = [excludedFeatures; m2];
 end;
 
 % Per drum we want to recognize: train pattern recognition models.
-for drum = [snare kick hihat]
+models = cell(size(drums));
+for i = 1:length(drums)
+    drum = drums{i};
     m1 = includedFeatures(drum);
     m2 = excludedFeatures(drum);
     
@@ -66,7 +79,6 @@ for drum = [snare kick hihat]
     % current drum. One model is used to detect if the drum is actively
     % sounding, and the other model detects if it is silent.
     sound = MakeLeftRightHMM(4, GaussD, soundTraining, soundTrainingLengths);
-    % silent = MakeGMM(5, silentTraining); TODO Use?
-    silent = MakeLeftRightHMM(1, GaussMixD(5), silentTraining, silentTrainingLengths);
-    models{end+1} = { drum, sound, silent };
+    silent = MakeGMM(5, silentTraining);
+    models{i} = { drum, sound, silent };
 end;
