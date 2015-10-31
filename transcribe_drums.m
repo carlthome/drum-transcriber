@@ -28,7 +28,7 @@ for i = 1:length(models)
         p1 = sound.logprob(window);
         p2 = silent.logprob(window);
         if (p1 > p2)
-            if DEBUG; disp(['Drum ' drum 'hit at ' time ' seconds.']); end;
+            disp(['Drum ' num2str(drum) ' hit at ' num2str(time) ' seconds.']);
             transcript(end+1, :) = [time drum];
         end;
     end;

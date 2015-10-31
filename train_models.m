@@ -29,7 +29,7 @@ includedFeatures = containers.Map(drums, {{}, {}, {}});
 excludedFeatures = containers.Map(drums, {{}, {}, {}});
 for file = dir([patternDirectory '/*.wav'])'
     n = file.name;
-    [~, name, ~] = fileparts(n);
+    [a, name, b] = fileparts(n);
     pathToAudio = [patternDirectory '/' name '.wav'];
     pathToMidi = [patternDirectory '/' name '.mid'];
     
@@ -66,8 +66,7 @@ for drum = [snare kick hihat]
     % current drum. One model is used to detect if the drum is actively
     % sounding, and the other model detects if it is silent.
     sound = MakeLeftRightHMM(4, GaussD, soundTraining, soundTrainingLengths);
-    silent = MakeGMM(5, silentTraining);
-    % TODO Use HMM for silent model instead?
-    % silent = MakeLeftRightHMM(2, GaussMixD(5), silentTraining, silentTrainingLengths);
+    % silent = MakeGMM(5, silentTraining); TODO Use?
+    silent = MakeLeftRightHMM(1, GaussMixD(5), silentTraining, silentTrainingLengths);
     models{end+1} = { drum, sound, silent };
 end;

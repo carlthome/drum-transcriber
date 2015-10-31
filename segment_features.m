@@ -20,7 +20,7 @@ for c = midiNotes
     % Go through occurences of note and store corresponding timestamps.
     onsets = midi(midi(:, 3) == midiNote, :);
     idxs = zeros(size(timestamps));
-    for i = 1:length(onsets)
+    for i = 1:size(onsets, 1)
         startTime = onsets(i, 5);
         endTime = onsets(i, 6);
         % TODO Allow some timing errors to alleviate problems with fixed

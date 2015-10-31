@@ -1,22 +1,28 @@
 DEBUG = true;
-VISUALIZE = true;
 
 % Include all child directories
 addpath(genpath('.'));
 
 % Try to load trained models from disk, or perform new training.
 try
-    if DEBUG; delete('matlab.mat'); end;
-    load;
+    if DEBUG; delete('models.mat'); end;
+    load models.mat;
 catch
     models = train_models('training-data');
-    save;
+    save models.mat;
 end;
 
-% str = input('', 's'); TODO Read test audio file on stdin?
+% Get path to source audio file to transcribe to destination MIDI file.
+if not(DEBUG)
+    sourcePath = input('', 's');
+    destinationPath = input('', 's');
+else
+    sourcePath = 'test.wav';
+    destinationPath = 'transcription.mid';
+end;
 
 % Transcribe drums in audio file with trained models.
-transcript = transcribe_drums('test.wav', models);
+transcript = transcribe_drums(sourcePath, models);
 
 % If drums were detected, create a MIDI file, else print an error.
 if isempty(transcript)
@@ -26,20 +32,32 @@ else
     midi = sequence_midi(transcript);
     
     % Store MIDI file on disk.
-    writemidi(midi, 'transcription.mid');
+    writemidi(midi, destinationPath);
     
-    % fprintf(str); TODO Print midi file on stdout?
-    
-    % Visualize test data result.
-    if VISUALIZE
-        figure;
-        [y, fs] = audioread('test.wav');
+    % Visualize result.
+    if DEBUG
+        [y, fs] = audioread(sourcePath);
         mono = (y(:, 1) + y(:, 2)) / 2;
-        Notes = midiInfo(midi, 0);
-        [PR, t, nn] = piano_roll(Notes);
-        subplot(2,1,1), imagesc(fs*t, nn, PR), title('MIDI'), xlabel('Sample'), ylabel('Note');
-        subplot(2,1,2), plot(mono), title('Waveform'), xlabel('Sample'), ylabel('Amplitude');
-    end;
+        notes = midiInfo(midi, 0);
+
+        figure;
+        hold on;
+        plot(mono);
+        for i= 1:size(notes, 1)
+            note = notes(i, 3);
+            onset = start + notes(i, 5) * fs;
+            if note == 36; line([onset onset], [-1 1], 'Color', 'r');
+            elseif note == 38; line([onset onset], [-1 1], 'Color', 'g');
+            elseif note == 42; line([onset onset], [-1 1], 'Color', 'b');
+            end
+        end
+        hold off;
+
+%         TODO Remove old plot?
+%         [PR, t, nn] = piano_roll(notes);
+%         subplot(2,1,1), imagesc(fs*t, nn, PR), title('MIDI'), xlabel('Sample'), ylabel('Note');
+%         subplot(2,1,2), plot(mono), title('Waveform'), xlabel('Sample'), ylabel('Amplitude');
+    end;    
 end;
 
 % Bye bye!
