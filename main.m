@@ -5,10 +5,11 @@ VISUALIZE = true;
 addpath(genpath('.'));
 
 % Try to load trained models from disk, or perform new training.
-try 
+try
+    if DEBUG; delete('matlab.mat'); end;
     load;
 catch
-    models = train_models('patterns');
+    models = train_models('training-data');
     save;
 end;
 
@@ -19,11 +20,11 @@ transcript = transcribe_drums('test.wav', models);
 
 % If drums were detected, create a MIDI file, else print an error.
 if isempty(transcript)
-    fprintf('No drums detected. Aborting.');
+    disp('No drums detected. Aborting.');
 else
     % Create MIDI file from the transcribed drums.
     midi = sequence_midi(transcript);
-
+    
     % Store MIDI file on disk.
     writemidi(midi, 'transcription.mid');
     

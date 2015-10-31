@@ -1,4 +1,4 @@
-function [ midi ] = sequence_midi( transcript )
+function midi = sequence_midi(transcript)
 %SEQUENCE_MIDI Convert a drum transcript to a MIDI sequence.
 %   The input transcript should be which drum note was triggered and at
 %   which time in seconds. The output is a single-track, single-channel
@@ -20,6 +20,3 @@ for t = transcript'
 end;
 
 midi = matrix2midi(midiSequence);
-
-end
-

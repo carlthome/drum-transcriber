@@ -27,22 +27,26 @@
 %----------------------------------------------------
 
 function logP=logprob(hmms, x)
-T = size(x,2); % Number of observations
-logP = zeros(size(hmms));
 
-% Go through all HMMs
+% Calculate forward probability per HMM.
+logP = zeros(size(hmms));
 for i=1:length(hmms)
     
     % Evaluate every observation in every state's PDF.
     [pX, logS] = hmms(i).OutputDistr.prob(x);
     
     % Forward algorithm for the HMM.
-    [~, c] = forward(hmms(i).StateGen,pX);
+    [~, c] = forward(hmms(i).StateGen, pX);
     
-    % Readjust values.
+    % TODO Remove.
+    if isnan(sum(c))
+        break;
+    end;
+    
+    % Calculate probability of seeing the complete observed sequence.
     logP(i) = sum(log(c(1:end-1)) + logS);
     
-    % For finite duration models, add probability of being in exit state.
+    % For finite duration, include probability of being in exit state.
     if hmms(i).StateGen.finiteDuration()
         logP(i) = logP(i) + log(c(end));
     end
