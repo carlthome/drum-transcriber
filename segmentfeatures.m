@@ -22,7 +22,13 @@ for midiNote = midiNotes'
     for i = 1:size(onsets, 1)
         startTime = onsets(i, 5);
         endTime = onsets(i, 6);
+        
+        % Pick all feature vectors occuring with note duration.
         idxs = idxs | startTime < timestamps & timestamps < endTime;
+        
+        % Always pick closest feature vector to onset time.
+        [~, idx] = min(abs(timestamps - startTime));
+        idxs(idx) = 1;
     end;
     
     % Select features occuring with and without note by splitting v into a
