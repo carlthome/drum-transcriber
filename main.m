@@ -1,4 +1,4 @@
-DEBUG = true;
+global DEBUG, DEBUG = true;
 
 % Include all child directories
 addpath(genpath('.'));
@@ -8,7 +8,7 @@ try
     if DEBUG; delete('models.mat'); end;
     load models.mat;
 catch
-    models = train_models('training-data');
+    models = trainmodels('training-data');
     save models.mat;
 end;
 
@@ -22,7 +22,7 @@ else
 end;
 
 % Transcribe drums in audio file with trained models.
-transcript = transcribe_drums(sourcePath, models);
+transcript = transcribedrums(sourcePath, models);
 
 % If drums were detected, create a MIDI file, else print an error.
 if isempty(transcript)
@@ -30,7 +30,7 @@ if isempty(transcript)
 else
     % Create MIDI file from the transcribed drums.
     % TODO Quantize MIDI file with tempo detection of audio file.
-    midi = sequence_midi(transcript);
+    midi = sequencemidi(transcript);
     
     % Store MIDI file on disk.
     writemidi(midi, destinationPath);

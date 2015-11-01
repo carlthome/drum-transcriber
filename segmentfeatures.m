@@ -1,5 +1,5 @@
-function [includedFeatures, excludedFeatures] = segment_features(features, timestamps, midiFilePath, midiNotes)
-%SEGMENT_FEATURES Segment feature vectors according to a MIDI file.
+function [includedFeatures, excludedFeatures] = segmentfeatures(features, timestamps, midiFilePath, midiNotes)
+%SEGMENTFEATURES Segment feature vectors according to a MIDI file.
 %   The input MIDI file is used to segment the set of features over time.
 %   includedFeatures is a cell array of matrices containing observation
 %   sequences when the MIDI note was on. excludedFeatures is the same but
@@ -14,9 +14,8 @@ excludedFeatures = containers.Map(midiNotes, {{[]}, {[]}, {[]}});
 % Read midi file to segment features with.
 midi = midiInfo(readmidi(midiFilePath), 0);
 
-for c = midiNotes
-    midiNote = c{1};
-    
+for midiNote = midiNotes'
+     
     % Go through occurences of note and store corresponding timestamps.
     onsets = midi(midi(:, 3) == midiNote, :);
     idxs = zeros(size(timestamps));

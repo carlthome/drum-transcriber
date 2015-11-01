@@ -1,5 +1,5 @@
-function midi = sequence_midi(transcript)
-%SEQUENCE_MIDI Convert a drum transcript to a MIDI sequence.
+function midi = sequencemidi(transcript)
+%SEQUENCEMIDI Convert a drum transcript to a MIDI sequence.
 %   The input transcript should be which drum note was triggered and at
 %   which time in seconds. The output is a single-track, single-channel
 %   MIDI sequence at fixed velocity with the transcribed drums as note-on

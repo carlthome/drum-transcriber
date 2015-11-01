@@ -1,5 +1,5 @@
-function transcript = transcribe_drums(audioPath, models)
-%TRANSCRIBE_DRUMS Recognize drums in a song.
+function transcript = transcribedrums(audioPath, models)
+%TRANSCRIBEDRUMS Recognize drums in a song.
 %   Given an audio file of a song featuring drums, and trained pattern
 %   recognition models, the likeliest transcript of drums is returned by
 %   extracting features from the audio file and comparing short observation
@@ -8,7 +8,7 @@ function transcript = transcribe_drums(audioPath, models)
 %   determines if the drum was triggered or not.
 
 % Read test data and extract features.
-[features, timestamps] = read_audio(audioPath);
+[features, timestamps] = readaudio(audioPath);
 
 % Go through each drum and determine if it's likeliest that it was silent
 % or not per frame.
@@ -20,7 +20,8 @@ for i = 1:length(models)
     silent = model{3};
     
     % TODO Test look-ahead segmentation. Is this too naive? What is a good
-    % window size?
+    % window size? Window size should probably be determined by audio
+    % segmentation window size and average drum stroke duration parameter.
     lookAhead = 10;
     for j = 1:length(features)-lookAhead
         window = features(:, j:j+lookAhead);

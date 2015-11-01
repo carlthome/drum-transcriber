@@ -1,5 +1,5 @@
-function models = train_models(patternDirectory)
-%TRAIN_MODELS Go through the given directory with patterns and train
+function models = trainmodels(patternDirectory)
+%TRAINMODELS Go through the given directory with patterns and train
 % models on the patterns.
 %   The pattern directory is expected to contain training data for the drum
 %   detector models. A pattern should be an audio file and a corresponding
@@ -15,11 +15,9 @@ function models = train_models(patternDirectory)
 %   probability the drum has likely been triggered in the observation
 %   sequence.
 
-% TODO Abstract drum map to separate script.
-kick = 36;
-snare = 38;
-hihat = 42;
-drums = {kick, snare, hihat};
+% Get MIDI notes for the drums to transcribe.
+drums = drummap();
+drums = drums{2}; % Drum MIDI numbers
 
 % Go through a directory with multiple songs (audio + MIDI pairs) and
 % extract and segment features (using the parallel processing toolbox).
@@ -34,13 +32,13 @@ parfor i = 1:length(paths)
     pathToMidi = [patternDirectory '/' name '.mid'];
     
     % Extract features from pattern.
-    [features, timestamps] = read_audio(pathToAudio);
+    [features, timestamps] = readaudio(pathToAudio);
     
     % Segment training data for the current drum into two parts, given a
     % MIDI file. One set of feature vectors when the drum is played
     % according to the MIDI file, and one set of the remaining feature
     % vectors.
-    [m1, m2] = segment_features(features, timestamps, pathToMidi, drums);
+    [m1, m2] = segmentfeatures(features, timestamps, pathToMidi, drums);
     included{i} = m1;
     excluded{i} = m2;
 end;
@@ -59,7 +57,7 @@ end;
 % Per drum we want to recognize: train pattern recognition models.
 models = cell(size(drums));
 for i = 1:length(drums)
-    drum = drums{i};
+    drum = drums(i);
     m1 = includedFeatures(drum);
     m2 = excludedFeatures(drum);
     
