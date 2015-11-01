@@ -43,8 +43,7 @@ parfor i = 1:length(paths)
     excluded{i} = m2;
 end;
 
-% Concatenate feature vector sequences, assuming there is silence in the
-% beginning and end of each song.
+% Concatenate maps.
 includedFeatures = containers.Map(drums, {{}, {}, {}});
 excludedFeatures = containers.Map(drums, {{}, {}, {}});
 for i = 1:length(paths)
@@ -55,7 +54,7 @@ for i = 1:length(paths)
 end;
 
 % Per drum we want to recognize: train pattern recognition models.
-models = cell(size(drums));
+models = {};
 for i = 1:length(drums)
     drum = drums(i);
     m1 = includedFeatures(drum);
@@ -76,7 +75,7 @@ for i = 1:length(drums)
     % Create, train and store a pair of pattern recognition models for the
     % current drum. One model is used to detect if the drum is actively
     % sounding, and the other model detects if it is silent.
-    sound = MakeLeftRightHMM(4, GaussD, soundTraining, soundTrainingLengths);
-    silent = MakeGMM(5, silentTraining);
-    models{i} = { drum, sound, silent };
+    sound = MakeLeftRightHMM(5, GaussD, soundTraining, soundTrainingLengths);
+    silent = MakeLeftRightHMM(1, GaussMixD(5), silentTraining, silentTrainingLengths);
+    models{end+1} = { drum, sound, silent };
 end;
