@@ -1,4 +1,4 @@
-function transcript = transcribedrums(audioPath, models)
+function transcript = transcribedrums(audioPath, drumModels)
 %TRANSCRIBEDRUMS Recognize drums in a song.
 %   Given an audio file of a song featuring drums, and trained pattern
 %   recognition models, the likeliest transcript of drums is returned by
@@ -8,27 +8,51 @@ function transcript = transcribedrums(audioPath, models)
 %   determines if the drum was triggered or not.
 
 % Read test data and extract features.
-[features, timestamps] = readaudio(audioPath);
+windowSize = 0.03;
+[features, timestamps] = readaudio(audioPath, windowSize);
 
 % Go through each drum and determine if it's likeliest that it was silent
 % or not per frame.
 transcript = zeros(0, 2);
-for i = 1:length(models)
-    model = models{i};
-    drum = model{1};
-    sound = model{2};
-    silent = model{3};
+for drumModel = drumModels
+    onsets = [];
     
-    % TODO Test look-ahead segmentation. Is this too naive? What is a good
-    % window size? Window size should probably be determined by audio
-    % segmentation window size and average drum stroke duration parameter.
-    lookAhead = 10;
-    for j = 1:length(features)-lookAhead
-        window = features(:, j:j+lookAhead);
+    % Skip empty models (i.e. training data never contained drum).
+    if isempty(drumModel.sound)
+        continue;
+    end;
+    
+    % Go through entire input sequence in tiny steps and try to find if
+    % drum is likely to have been triggered or not.
+    observationSequenceLength = floor(drumModel.duration / windowSize) + 1;
+    for j = 1:length(features)-observationSequenceLength
+        window = features(:, j:j+observationSequenceLength);
         time = timestamps(j);
-        if sound.logprob(window) > silent.logprob(window)
-            disp(['Drum ' num2str(drum) ' hit at ' num2str(time) ' seconds.']);
-            transcript(end+1, :) = [time drum];
+        if drumModel.sound.logprob(window) > drumModel.silent.logprob(window)
+            onsets(end+1) = time;
+            j = j + observationSequenceLength; % TODO Test skipping on hit.
         end;
     end;
+    
+    % TODO Make into function parameter.
+    smoothing = 0.0;
+    
+    % Smooth transcript by keeeping first occurence of close drum triggers.
+    dt = smoothing*drumModel.duration;
+    onsets(diff(onsets) < dt) = [];
+    
+    % Smooth transcript by averaging close drum triggers in time.
+    smoothingTime = smoothing*drumModel.duration;
+    dt = [0 diff(onsets)];
+    s = 0;
+    n = 0;
+    for j = 1:length(onsets)
+        s = s + onsets(j);
+        n = n + 1;
+        if dt(j) > smoothingTime 
+            transcript(end+1, :) = [s/n drumModel.note];
+            s = 0;
+            n = 0;
+        end;
+    end;    
 end;

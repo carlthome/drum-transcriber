@@ -5,8 +5,11 @@ function [includedFeatures, excludedFeatures] = segmentfeatures(features, timest
 %   sequences when the MIDI note was on. excludedFeatures is the same but
 %   when the MIDI note was off.
 
-% TODO Only use channel 10? TODO Make track selectable? TODO Strip
-% note-off?
+% TODO Only use channel 10?
+
+% TODO Make track selectable?
+
+% TODO Strip note-off?
 
 [vals{1:length(midiNotes)}] = deal({[]});
 includedFeatures = containers.Map(midiNotes, vals);
@@ -15,7 +18,8 @@ excludedFeatures = containers.Map(midiNotes, vals);
 % Read midi file to segment features with.
 midi = midiInfo(readmidi(midiFilePath), 0);
 
-for midiNote = midiNotes'
+% Segment each input MIDI note.
+for midiNote = midiNotes
      
     % Go through occurences of note and store corresponding timestamps.
     onsets = midi(midi(:, 3) == midiNote, :);
