@@ -8,8 +8,9 @@ function [includedFeatures, excludedFeatures] = segmentfeatures(features, timest
 % TODO Only use channel 10? TODO Make track selectable? TODO Strip
 % note-off?
 
-includedFeatures = containers.Map(midiNotes, {{[]}, {[]}, {[]}});
-excludedFeatures = containers.Map(midiNotes, {{[]}, {[]}, {[]}});
+[vals{1:length(midiNotes)}] = deal({[]});
+includedFeatures = containers.Map(midiNotes, vals);
+excludedFeatures = containers.Map(midiNotes, vals);
 
 % Read midi file to segment features with.
 midi = midiInfo(readmidi(midiFilePath), 0);
