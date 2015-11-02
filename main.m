@@ -1,4 +1,6 @@
-global DEBUG, DEBUG = true;
+function models = main(sourcePath, destinationPath)
+
+DEBUG = true;
 
 % Post-processing. Smoothing combines close drum hits in time. Quantization
 % moves remaining drum hits to a 4/4 16-note grid.
@@ -15,15 +17,6 @@ try
 catch
     models = trainmodels('training-data');
     save models.mat;
-end;
-
-% Get path to source audio file to transcribe to destination MIDI file.
-if not(DEBUG)
-    sourcePath = input('', 's');
-    destinationPath = input('', 's');
-else
-    sourcePath = 'test.wav';
-    destinationPath = 'transcription.mid';
 end;
 
 % Transcribe drums in audio file with trained models.
@@ -45,24 +38,28 @@ else
         [y, fs] = audioread(sourcePath);
         mono = (y(:, 1) + y(:, 2)) / 2;
         notes = midiInfo(midi, 0);
-        
+
         figure;
-        subplot(2,1,1);
+        colormap gray;
+        ax1 = subplot(2,1,1);
         plot(mono), title('Waveform'), xlabel('Time'), ylabel('Amplitude');
-        gca.XTick = 0:0.1:length(y)/fs;
-        % TODO Plot all drums.
-        for note = [36 38 42]
+%         ax1.XTick = 0:0.1:length(mono)/fs;
+        drums = drummap();
+        for note = [drums.note]
             onsets = notes(notes(:, 3) == note, 5);
             hold on;
             arrayfun(@(x) line(fs*[x x], [-1 1], 'LineStyle', ':'), onsets);
             hold off;
         end
         [pr, t, nn] = piano_roll(notes);
-        subplot(2,1,2), imagesc(fs*t, nn, pr), title('MIDI Sequence'), xlabel('Time'), ylabel('Note');
-    end;
-end;
+        ax2 = subplot(2,1,2);
+%         ax2.XTick = 0:0.1:length(mono)/fs;
+        imagesc(ceil(fs*t), nn, pr), title('MIDI'), xlabel('Time'), ylabel('Note');
+        linkaxes([ax1 ax2],'x');
+    end
+end
 
 % Bye bye!
 if not(DEBUG)
     exit;
-end;
+end

@@ -5,6 +5,9 @@ function ensttomidi(enstDirectory, trainingDataDirectory)
 %   found online at:
 %   http://perso.telecom-paristech.fr/~grichard/ENST-drums/
 
+% Create training data directory.
+mkdir(trainingDataDirectory);
+
 % Load drum map
 drums = drummap();
 
