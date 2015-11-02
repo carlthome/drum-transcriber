@@ -1,14 +1,17 @@
-function [precision, recall] = transcriptionperformance(resultFilepath, expectedFilepath)
-%TRANSCRIPTIONPERFORMANCE computes precision and recall of a result
-%transcription. Precision is the ratio of resulting drum events that have a
-%match in the expected transcription. Recall is the ratio of the expected
-%drum events that have a match in the resulting transcription.
+function [precision, recall] = transcriptionperformance(actualPath, expectedPath)
+%TRANSCRIPTIONPERFORMANCE Compute precision and recall of transcription.
+%   Precision is the ratio of resulting drum events that have a match in
+%   the expected transcription. Recall is the ratio of the expected drum
+%   events that have a match in the resulting transcription. actualPath
+%   should be the path to a MIDI file containing the output drum
+%   transcription. expectedPath should be the path to the actual drum
+%   transcription (manually annotated by humans, for example).
 
 deltaTime = 0.03;
 
-result = readmidi(resultFilepath);
+result = readmidi(actualPath);
 resultNotes = midiInfo(result, 0);
-expected = readmidi(expectedFilepath);
+expected = readmidi(expectedPath);
 expectedNotes = midiInfo(expected, 0);
 
 precision = matchnotes(resultNotes, expectedNotes, deltaTime);
