@@ -10,7 +10,7 @@ notes = {36, 38, 42, 46, 49, 59, 56, 57, 69, 72, 73, 65, 66, 62, 85, 84, 55};
 durations = {0.1, 0.08, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
 
 global drumDuration
-if isempty('drumDuration')
+if ~isempty('drumDuration')
   durations = cell(1, size(labels, 2));
   [durations{:}] = deal(drumDuration);
 end
