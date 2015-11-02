@@ -25,18 +25,14 @@ for file = dir([annotationsDirectory '/*.txt'])'
     annotation = textscan(fid, '%f %s');
     fclose(fid);
     
-    % Sequence annotation to MIDI and store to disk.
+   % Sequence annotation to MIDI and store to disk.
     M = ones(size(annotation{1}, 1), 6); % Assume track one and channel one.
     M(:, 4) = 127; % Velocity
     M(:, 5) = annotation{1}; % Note on
-    for i = 1:length(drums{1})
-        label = drums{1}(i);
-        note = drums{2}(i);
-        duration = drums{3}(i);
-        
-        idxs = strcmp(annotation{2}, label);
-        M(idxs, 3) = note; % Note number
-        M(idxs, 6) = M(idxs, 5) + duration; % Note off
+    for drum = drums
+        idxs = strcmp(annotation{2}, drum.name);
+        M(idxs, 3) = drum.note;
+        M(idxs, 6) = M(idxs, 5) + drum.duration;
     end;
     
     % Store sequenced MIDI to disk.
