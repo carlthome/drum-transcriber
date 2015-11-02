@@ -3,3 +3,4 @@
 transcription.mid
 training-data/*
 test.wav
+models/
