@@ -1,5 +1,10 @@
 global DEBUG, DEBUG = true;
 
+% Post-processing. Smoothing combines close drum hits in time. Quantization
+% moves remaining drum hits to a 4/4 16-note grid.
+smoothing = 0.0; % [0.0, 1.0]
+quantization = 0.0; % [0.0, 1.0]
+
 % Include all child directories
 addpath(genpath('.'));
 
@@ -22,15 +27,15 @@ else
 end;
 
 % Transcribe drums in audio file with trained models.
-transcript = transcribedrums(sourcePath, models);
+transcript = transcribedrums(sourcePath, models, smoothing);
 
 % If drums were detected, create a MIDI file, else print an error.
 if isempty(transcript)
     disp('No drums detected. Aborting.');
 else
     % Create MIDI file from the transcribed drums.
-    % TODO Quantize MIDI file with tempo detection of audio file.
-    midi = sequencemidi(transcript);
+    tempo = mirgetdata(mirtempo(sourcePath, 'Spectrum'));
+    midi = sequencemidi(transcript, tempo, quantization);
     
     % Store MIDI file on disk.
     writemidi(midi, destinationPath);
