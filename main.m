@@ -45,25 +45,21 @@ else
         [y, fs] = audioread(sourcePath);
         mono = (y(:, 1) + y(:, 2)) / 2;
         notes = midiInfo(midi, 0);
-
+        
         figure;
-        hold on;
-        plot(mono);
-        for i= 1:size(notes, 1)
-            note = notes(i, 3);
-            onset = notes(i, 5) * fs;
-            if note == 36; line([onset onset], [-1 1], 'Color', 'r');
-            elseif note == 38; line([onset onset], [-1 1], 'Color', 'g');
-            elseif note == 42; line([onset onset], [-1 1], 'Color', 'b');
-            end
+        subplot(2,1,1);
+        plot(mono), title('Waveform'), xlabel('Time'), ylabel('Amplitude');
+        gca.XTick = 0:0.1:length(y)/fs;
+        % TODO Plot all drums.
+        for note = [36 38 42]
+            onsets = notes(notes(:, 3) == note, 5);
+            hold on;
+            arrayfun(@(x) line(fs*[x x], [-1 1], 'LineStyle', ':'), onsets);
+            hold off;
         end
-        hold off;
-
-%         TODO Remove old plot?
-%         [PR, t, nn] = piano_roll(notes);
-%         subplot(2,1,1), imagesc(fs*t, nn, PR), title('MIDI'), xlabel('Sample'), ylabel('Note');
-%         subplot(2,1,2), plot(mono), title('Waveform'), xlabel('Sample'), ylabel('Amplitude');
-    end;    
+        [pr, t, nn] = piano_roll(notes);
+        subplot(2,1,2), imagesc(fs*t, nn, pr), title('MIDI Sequence'), xlabel('Time'), ylabel('Note');
+    end;
 end;
 
 % Bye bye!
