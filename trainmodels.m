@@ -25,8 +25,7 @@ parfor i = 1:length(paths)
     pathToMidi = [patternDirectory '/' name '.mid'];
     
     % Extract features from pattern.
-    windowSize = 0.03;
-    [features, timestamps] = readaudio(pathToAudio, windowSize);
+    [features, timestamps] = readaudio(pathToAudio);
     
     % Segment training data for the current drum into two parts, given a
     % MIDI file. One set of feature vectors when the drum is played
@@ -51,6 +50,7 @@ end;
 % Per drum we want to recognize: train pattern recognition models.
 models = drums;
 for i = 1:length(drums)
+    
     % Get relevant feature segmentation for current drum.
     included = includedFeatures(models(i).note);
     excluded = excludedFeatures(models(i).note);

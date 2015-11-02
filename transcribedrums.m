@@ -18,8 +18,7 @@ if nargin < 3
 end;
 
 % Read test data and extract features.
-windowSize = 0.03; % TODO Maybe remove parameter from readaudio?
-[features, timestamps] = readaudio(audioPath, windowSize);
+[features, timestamps, windowSize] = readaudio(audioPath);
 
 % Transcribe each drum separately.
 transcript = zeros(0, 2);
