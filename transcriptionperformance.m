@@ -25,13 +25,17 @@ function ratio = matchnotes(matchFrom, matchIn, deltaTime)
     note = matchFrom(de, 3);
     onset = matchFrom(de, 5);
     
-    % TODO should a match only be used once?
+    possibleMatchIndexes = find(matchIn(:, 3) == note & abs(matchIn(:, 5) - onset) <= deltaTime);
     
-    % Intersection of drum events of same type and drum events within
-    % deltatime
-    possibleMatches = matchIn(:, 3) == note & abs(matchIn(:, 5) - onset) <= deltaTime;
-    if (sum(possibleMatches) > 0); matchedNotes = matchedNotes + 1; end
+    if ~isempty(possibleMatchIndexes)
+      possibleMatches = matchIn(possibleMatchIndexes, :);
+      [~, ind] = min(abs(possibleMatches(:, 5) - onset));
+      matchIn(possibleMatchIndexes(ind), 3) = -1;
+      
+      matchedNotes = matchedNotes + 1;
+    end
   end
   
   ratio = matchedNotes / size(matchFrom, 1);
+  
 end
