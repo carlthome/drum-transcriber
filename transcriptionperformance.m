@@ -7,6 +7,11 @@ function [precision, recall] = transcriptionperformance(actualPath, expectedPath
 %   transcription. expectedPath should be the path to the actual drum
 %   transcription (manually annotated by humans, for example).
 
+% TODO Return one precision and recall number per MIDI note, and not only
+% a total average.
+
+% TODO Make deltaTime an optional input parameter.
+
 deltaTime = 0.03;
 
 result = readmidi(actualPath);
