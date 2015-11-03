@@ -64,6 +64,7 @@ end
 
 % Backward steps
 for t = T-1:-1:1
+    % TODO Try to vectorize the following for-loop for better performance.
     for i = 1:N
         betaHat(i, t) = sum((A(i, 1:end-1)' .* pX(:, t+1) .* betaHat(:, t+1))) / c(t);
     end;

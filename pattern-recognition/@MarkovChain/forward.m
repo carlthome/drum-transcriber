@@ -56,6 +56,7 @@ alfaHat(:, 1) = alfaTemp(:, 1) / c(1);
 
 % Forward steps
 for t = 2:T
+    % TODO Try to vectorize the following for-loop for better performance.
     for j = 1:N
         alfaTemp(j, t) = pX(j, t) * sum(A(:, j) .* alfaHat(:, t-1));
     end;
