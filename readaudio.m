@@ -1,4 +1,4 @@
-function [features, timestamps, windowSize] = readaudio(filePath)
+function [features, windowSize] = readaudio(filePath)
 %READAUDIO Extract features from audio file.
 %   The audio file is segmented into frames and MFCC is applied per frame.
 %   features is a matrix containing each MFCC frame columnwise, over time.
@@ -9,8 +9,8 @@ function [features, timestamps, windowSize] = readaudio(filePath)
 % mirparallel(1);           % TODO Use MIRtoolbox in parallel. Doesn't seem to work.
 mirverbose(0);              % Hide console output
 mirwaitbar(0);              % Hide progress bars
-windowSize = 0.0464;        % Frame duration
-windowOverlap = 0.75;       % Frame overlap
+windowSize = 0.03;          % Frame duration
+windowOverlap = 0.5;        % Frame overlap
 melBands = 40;              % Number of mel-bands in MFCC
 mfccCoefficients = 0:12;    % The MFCC coefficients to calculate
 deltas = 0:1;               % MFCC orders
@@ -44,3 +44,6 @@ end;
 features = bsxfun(@rdivide, bsxfun(@minus, features, mean(features, 2)), std(features, 0, 2));
 
 % TODO Perform PCA and remove dead features.
+
+% Return struct array with feature vectors and their timestamps.
+features = struct('data', features, 'time', timestamps);

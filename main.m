@@ -1,30 +1,37 @@
-function models = main(sourcePath, destinationPath)
+function main(sourcePath, destinationPath, visualize, smoothing, quantization)
+%MAIN Transcribe drums into a MIDI file given an audio file.
+%   Create a MIDI file transcription of the drums contained in the input
+%   audio file. sourcePath should be the path to an audio file,
+%   destinationPath is the path to the created MIDI file. visuzalize is a
+%   boolean determining whether to plot results or not. smoothing is a
+%   float from 0.0 to 1.0 determining how close drum hits can be in time
+%   before they are combined. quantization is a float from 0.0 to 1.0
+%   determining how much to move the remaining drum hits into a 4/4 16-note
+%   grid.
 
-DEBUG = true;
-
-% Post-processing. Smoothing combines close drum hits in time. Quantization
-% moves remaining drum hits to a 4/4 16-note grid.
-smoothing = 0.0; % [0.0, 1.0]
-quantization = 0.0; % [0.0, 1.0]
+% Make sure file paths are good.
+if ~exist(sourcePath); error('Audio file not found.'); end;
+if exist(destinationPath); error('Destination file already exists.'); end;
 
 % Include all child directories
 addpath(genpath('.'));
 
 % Try to load trained models from disk, or perform new training.
-try
-    if DEBUG; delete('models.mat'); end;
-    load models.mat;
+try 
+    load('models.mat', 'models');
+    disp('Models loaded.');
 catch
+    disp('Models not found. Training new models. Be patient.');
     models = trainmodels('training-data');
-    save models.mat;
-end;
+    save('models.mat', 'models');
+end
 
 % Transcribe drums in audio file with trained models.
 transcript = transcribedrums(sourcePath, models, smoothing);
 
 % If drums were detected, create a MIDI file, else print an error.
 if isempty(transcript)
-    disp('No drums detected. Aborting.');
+    disp('No drums detected. Aborting...');
 else
     % Create MIDI file from the transcribed drums.
     tempo = mirgetdata(mirtempo(sourcePath, 'Spectrum'));
@@ -34,32 +41,7 @@ else
     writemidi(midi, destinationPath);
     
     % Visualize result.
-    if DEBUG
-        [y, fs] = audioread(sourcePath);
-        mono = (y(:, 1) + y(:, 2)) / 2;
-        notes = midiInfo(midi, 0);
-
-        figure;
-        colormap gray;
-        ax1 = subplot(2,1,1);
-        plot(mono), title('Waveform'), xlabel('Time'), ylabel('Amplitude');
-%         ax1.XTick = 0:0.1:length(mono)/fs;
-        drums = drummap();
-        for note = [drums.note]
-            onsets = notes(notes(:, 3) == note, 5);
-            hold on;
-            arrayfun(@(x) line(fs*[x x], [-1 1], 'LineStyle', ':'), onsets);
-            hold off;
-        end
-        [pr, t, nn] = piano_roll(notes);
-        ax2 = subplot(2,1,2);
-%         ax2.XTick = 0:0.1:length(mono)/fs;
-        imagesc(ceil(fs*t), nn, pr), title('MIDI'), xlabel('Time'), ylabel('Note');
-        linkaxes([ax1 ax2],'x');
-    end
-end
-
-% Bye bye!
-if not(DEBUG)
-    exit;
+    if visualize
+        visualizetranscript(sourcePath, destinationPath);
+    end;
 end

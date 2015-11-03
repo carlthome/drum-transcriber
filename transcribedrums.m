@@ -18,7 +18,7 @@ if nargin < 3
 end;
 
 % Read test data and extract features.
-[features, timestamps, windowSize] = readaudio(audioPath);
+[features, windowSize] = readaudio(audioPath);
 
 % Transcribe each drum separately.
 transcript = zeros(0, 2);
@@ -33,14 +33,14 @@ for drumModel = drumModels
     % Step through input and try to find at each step if the drum is likely
     % to have been hit or not.
     observationSequenceLength = floor(drumModel.duration / windowSize) + 1;
-    for j = 1:length(features)-observationSequenceLength
-        window = features(:, j:j+observationSequenceLength);
+    for j = 1:length(features.data)-observationSequenceLength
+        window = features.data(:, j:j+observationSequenceLength);
         p1 = drumModel.sound.logprob(window);
         p2 = drumModel.silent.logprob(window);
         if p1 > p2
             % Drum was likely hit. Store the time and certainty of the
             % stroke.´
-            onsets(end+1) = struct('time', timestamps(j), 'certainty', p1 - p2);
+            onsets(end+1) = struct('time', features.time(j), 'certainty', p1 - p2);
             
             %TODO Since a hit was registered, skip ahead to avoid
             %retriggering?
