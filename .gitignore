@@ -1,6 +1,6 @@
 *.asv
 *.mat
-transcription.mid
+*.mirtmp
 training-data/*
 test.wav
-models/
+test.mid
